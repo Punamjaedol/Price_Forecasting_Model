@@ -196,9 +196,9 @@ def preprocess(rows):
     # Remove abnormal prices
     df = df[
         ~(
-            ((df["item_code_raw"] == "H001-105")   & (df["price"] == 10)) |
-            ((df["item_code_raw"] == "H011-507-D") & (df["price"] == 12450)) |
-            ((df["item_code_raw"] == "H033-501-A") & (df["price"] == 4080))
+            ((df["item_code_raw"] == "ITEM-A")   & (df["price"] == 10)) |
+            ((df["item_code_raw"] == "ITEM-B") & (df["price"] == 12450)) |
+            ((df["item_code_raw"] == "ITEM-C") & (df["price"] == 4080))
         )
     ].reset_index(drop=True)
 

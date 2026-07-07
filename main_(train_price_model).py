@@ -1,4 +1,3 @@
-from Hydrotech.config import PURCH_TABLE
 import copy, sys, time
 from datetime import datetime, timedelta
 import joblib
