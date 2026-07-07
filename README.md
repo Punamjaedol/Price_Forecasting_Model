@@ -44,7 +44,7 @@ A deep learning-based model for forecasting future unit prices using historical 
 
 ## Project Structure
 
-- `main_(train).py`: Model training entry point.
+- `main_(train_model).py`: Model training entry point.
 - `main_(inference).py`: Batch inference entry point.
 - `model.py`: Neural network architecture.
 - `dataset.py`: Dataset, preprocessing, and DataLoader utilities.
@@ -122,38 +122,37 @@ python main_(inference).py
 
 Or execute the provided batch scripts for automated scheduling.
 
-## Workflow
+## Automated MLOps Workflow & Lifecycle
 
-The project is designed for automated monthly model retraining and batch inference.
+This project is built with a focus on long-term maintainability and automated model lifecycles, moving away from simple one-time script executions to a fully continuous pipeline.
 
-1. Retrieve the latest **3 years** of transaction data from the MSSQL database.
-2. Preprocess and clean the transaction records.
-3. Retrain the price forecasting model.
-4. Save the trained model, LabelEncoder, and metadata.
-5. Load the latest trained model.
-6. Retrieve the **latest 10 transactions** for each item used during training.
-7. Predict the next transaction unit price for every trained item.
-8. Store prediction results in the database.
+1. **Data Ingestion**: Programmatically connects to the data warehouse to fetch historical time-series logs.
+2. **Robust Preprocessing**: Automatically handles missing values, filters out noise/outliers (IQR method), and applies log-scaling for stability.
+3. **Continuous Retraining**: Retrains the sequential model to capture evolving temporal patterns over time.
+4. **Artifact Persistence**: Packages and exports the updated model weights, `LabelEncoder`, and item metadata simultaneously.
+5. **Dynamic Inference Pipeline**: Loads the newly minted checkpoints and pulls the latest transaction context for all active items.
+6. **Batch Forecasting**: Executes distributed predictions across all valid target classes.
+7. **Storage Feedback Loop**: Updates the data store with future forecasts, closing the end-to-end automation loop.
 
-## Automation
 
-The project supports fully automated monthly execution using Windows Task Scheduler.
+##  Pipeline Automation & Orchestration
 
-Two batch scripts are provided:
+To achieve true zero-touch automation and demonstrate long-term system stability, the repository includes ready-to-use orchestration scripts. This architecture allows the entire system to run seamlessly via scheduling utilities (such as Windows Task Scheduler or Cron jobs).
 
-- `run_train.bat`
-  - Retrains the model using the latest transaction data.
-  - Saves training logs under `logs/Train/`.
+Two integrated batch scripts orchestrate the pipeline:
 
-- `run_inference.bat`
-  - Loads the latest trained model.
-  - Predicts future prices for all trained items.
-  - Saves inference logs under `logs/Inference/`.
+* `run_train.bat`
+  - Automates the full data ingestion and model retraining loop.
+  - Automatically structures and isolates time-stamped training metrics under `logs/Train/`.
 
-Typical production schedule:
+* `run_inference.bat`
+  - Instantly hooks into the latest available model checkpoint.
+  - Generates parallel future forecasts and records execution footprints under `logs/Inference/`.
 
-- Monthly model retraining
-- Monthly batch inference after training completes
+### Key Architectural Strengths:
+* **Decoupled Design**: Training and inference phases are structurally isolated, allowing independent scheduling intervals depending on data velocity.
+* **Production-Ready Logging**: Every execution stream automatically pipes standard outputs and tracebacks into separate log files for reliable long-term monitoring and debugging.
+* **End-to-End Autonomy**: Once configured, the system manages data flow, pipeline health, and prediction storage indefinitely without manual code modification.
 
 ## Notes
 
